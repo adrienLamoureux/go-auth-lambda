@@ -13,7 +13,7 @@ var jwtKey = []byte("my_secret_key")
 
 var users = map[string]string{
 	"user1": "password1",
-	"user2": "password2",
+	"a@a":   "a",
 }
 
 // Create a struct to read the username and password from the request body
@@ -27,6 +27,11 @@ type Credentials struct {
 type Claims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
+}
+
+type loginResponse struct {
+	Token      string `json:"token"`
+	ExpireTime int64  `json:"expireTm"`
 }
 
 // Create the Signin handler
@@ -80,4 +85,14 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
+
+	loginResponseJSON, err := json.Marshal(loginResponse{
+		Token:      tokenString,
+		ExpireTime: expirationTime.Unix(),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	w.Write(loginResponseJSON)
 }

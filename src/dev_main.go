@@ -10,6 +10,5 @@ import (
 )
 
 func main() {
-	handlers.CreateRouter()
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":7200", handlers.CreateRouter()))
 }
