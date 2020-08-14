@@ -25,8 +25,7 @@ type loginResponse struct {
 	ExpireTime int64  `json:"expireTm"`
 }
 
-// Create the Signin handler
-func Signin(w http.ResponseWriter, r *http.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 	var creds loginRequestBody
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {

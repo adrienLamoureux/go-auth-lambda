@@ -23,7 +23,4 @@ func init() {
 
 	// Create DynamoDB client
 	svc = dynamodb.New(sess)
-
-	createAccountTable()
-	createAccountEmailTable()
 }

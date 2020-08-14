@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type getItemInfo struct {
+type keyItemInfo struct {
 	HashKeyName   string
 	HashKeyValue  string
 	RangeKeyName  *string
@@ -28,19 +28,37 @@ func putItem(item interface{}, tableName string) error {
 	return err
 }
 
-func getItem(getInfo *getItemInfo, tableName string) (*dynamodb.GetItemOutput, error) {
+func getItem(keyInfo *keyItemInfo, tableName string) (*dynamodb.GetItemOutput, error) {
 	keyMap := map[string]*dynamodb.AttributeValue{
-		getInfo.HashKeyName: {
-			S: aws.String(getInfo.HashKeyValue),
+		keyInfo.HashKeyName: {
+			S: aws.String(keyInfo.HashKeyValue),
 		},
 	}
-	if getInfo.RangeKeyName != nil && getInfo.RangeKeyValue != nil {
-		keyMap[*getInfo.RangeKeyName] = &dynamodb.AttributeValue{
-			S: aws.String(*getInfo.RangeKeyValue),
+	if keyInfo.RangeKeyName != nil && keyInfo.RangeKeyValue != nil {
+		keyMap[*keyInfo.RangeKeyName] = &dynamodb.AttributeValue{
+			S: aws.String(*keyInfo.RangeKeyValue),
 		}
 	}
 	return svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(tableName),
 		Key:       keyMap,
 	})
+}
+
+func deleteItem(keyInfo *keyItemInfo, tableName string) error {
+	keyMap := map[string]*dynamodb.AttributeValue{
+		keyInfo.HashKeyName: {
+			S: aws.String(keyInfo.HashKeyValue),
+		},
+	}
+	if keyInfo.RangeKeyName != nil && keyInfo.RangeKeyValue != nil {
+		keyMap[*keyInfo.RangeKeyName] = &dynamodb.AttributeValue{
+			S: aws.String(*keyInfo.RangeKeyValue),
+		}
+	}
+	_, err := svc.DeleteItem(&dynamodb.DeleteItemInput{
+		TableName: aws.String(tableName),
+		Key:       keyMap,
+	})
+	return err
 }

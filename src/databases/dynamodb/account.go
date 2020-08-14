@@ -11,7 +11,7 @@ type AccountDynamoDB struct {
 }
 
 func (accountDynamoDB *AccountDynamoDB) CreateAccount(accInfo *databases.AccountInfo) error {
-	timeNow := time.Now().UnixNano()
+	timeNow := time.Now().Unix()
 	return putItem(&accountTableData{
 		AccID:     accInfo.AccID,
 		Email:     accInfo.Email,
@@ -24,7 +24,7 @@ func (accountDynamoDB *AccountDynamoDB) CreateAccount(accInfo *databases.Account
 }
 
 func (accountDynamoDB *AccountDynamoDB) CreateAccountEmail(accEmailInfo *databases.AccountEmailInfo) error {
-	timeNow := time.Now().UnixNano()
+	timeNow := time.Now().Unix()
 	return putItem(&accountEmailTableData{
 		AccID:    accEmailInfo.AccID,
 		Email:    accEmailInfo.Email,
@@ -34,7 +34,7 @@ func (accountDynamoDB *AccountDynamoDB) CreateAccountEmail(accEmailInfo *databas
 }
 
 func (accountDynamoDB *AccountDynamoDB) GetAccountEmailByEmail(email string) (*databases.AccountEmailInfo, error) {
-	result, err := getItem(&getItemInfo{
+	result, err := getItem(&keyItemInfo{
 		HashKeyName:  "email",
 		HashKeyValue: email,
 	}, accountEmailTableDefaultName)
@@ -55,7 +55,7 @@ func (accountDynamoDB *AccountDynamoDB) GetAccountEmailByEmail(email string) (*d
 }
 
 func (accountDynamoDB *AccountDynamoDB) GetAccountInfo(accID string) (*databases.AccountInfo, error) {
-	result, err := getItem(&getItemInfo{
+	result, err := getItem(&keyItemInfo{
 		HashKeyName:  "accId",
 		HashKeyValue: accID,
 	}, accountTableDefaultName)
@@ -73,6 +73,26 @@ func (accountDynamoDB *AccountDynamoDB) GetAccountInfo(accID string) (*databases
 	}
 
 	return item.toAbstract(), nil
+}
+
+func (accountDynamoDB *AccountDynamoDB) CreateAccountFavMovie(accID, movieID string) error {
+	timeNow := time.Now().Unix()
+	return putItem(&accountFavMovieTableData{
+		AccID:    accID,
+		MovieID:  movieID,
+		CreateTm: timeNow,
+		UpdateTm: timeNow,
+	}, accountFavMovieTableDefaultName)
+}
+
+func (accountDynamoDB *AccountDynamoDB) DeleteAccountFavMovie(accID, movieID string) error {
+	movieKeyName := "movieId"
+	return deleteItem(&keyItemInfo{
+		HashKeyName:   "accId",
+		HashKeyValue:  accID,
+		RangeKeyName:  &movieKeyName,
+		RangeKeyValue: &movieID,
+	}, accountFavMovieTableDefaultName)
 }
 
 type accountTableData struct {
@@ -107,4 +127,11 @@ func (accountData *accountEmailTableData) toAbstract() *databases.AccountEmailIn
 		AccID: accountData.AccID,
 		Email: accountData.Email,
 	}
+}
+
+type accountFavMovieTableData struct {
+	AccID    string `json:"accId"`
+	MovieID  string `json:"movieId"`
+	CreateTm int64  `json:"createTm"`
+	UpdateTm int64  `json:"updateTm"`
 }

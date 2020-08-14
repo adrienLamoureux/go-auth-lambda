@@ -1,19 +1,17 @@
 package dynamodb
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 const (
-	accountTableDefaultName      = "accounts"
-	accountEmailTableDefaultName = "account_emails"
+	accountTableDefaultName         = "accounts"
+	accountEmailTableDefaultName    = "account_emails"
+	accountFavMovieTableDefaultName = "account_fav_movies"
 )
 
-func createAccountTable() {
+func CreateAccountTable() error {
 	tableName := accountTableDefaultName
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -36,15 +34,12 @@ func createAccountTable() {
 	}
 	_, err := svc.CreateTable(input)
 	if err != nil {
-		fmt.Println("Got error calling CreateTable:")
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return err
 	}
-
-	fmt.Println("Created the table", tableName)
+	return nil
 }
 
-func createAccountEmailTable() {
+func CreateAccountEmailTable() error {
 	tableName := accountEmailTableDefaultName
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -67,10 +62,61 @@ func createAccountEmailTable() {
 	}
 	_, err := svc.CreateTable(input)
 	if err != nil {
-		fmt.Println("Got error calling CreateTable:")
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return err
 	}
+	return nil
+}
 
-	fmt.Println("Created the table", tableName)
+func CreateAccountFavMovieTable() error {
+	tableName := accountFavMovieTableDefaultName
+	input := &dynamodb.CreateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("accId"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("movieId"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("accId"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("movieId"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		GlobalSecondaryIndexes: []*dynamodb.GlobalSecondaryIndex{
+			&dynamodb.GlobalSecondaryIndex{
+				IndexName: aws.String("movieIndex"), // Find out the accounts who like a movie
+				KeySchema: []*dynamodb.KeySchemaElement{
+					{
+						AttributeName: aws.String("movieId"),
+						KeyType:       aws.String("HASH"),
+					},
+				},
+				Projection: &dynamodb.Projection{
+					ProjectionType: aws.String(dynamodb.ProjectionTypeAll),
+				},
+				ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+					ReadCapacityUnits:  aws.Int64(10),
+					WriteCapacityUnits: aws.Int64(10),
+				},
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+		TableName: aws.String(tableName),
+	}
+	_, err := svc.CreateTable(input)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -13,7 +13,7 @@ type refreshResponse struct {
 	ExpireTime int64  `json:"expireTm"`
 }
 
-func Refresh(w http.ResponseWriter, r *http.Request) {
+func refresh(w http.ResponseWriter, r *http.Request) {
 	// TODO: Extract the token from header
 	tknStr := ""
 	claim := &claims{}

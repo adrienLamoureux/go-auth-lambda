@@ -5,6 +5,8 @@ type IAccountDatabase interface {
 	CreateAccountEmail(accEmailInfo *AccountEmailInfo) error
 	GetAccountEmailByEmail(email string) (*AccountEmailInfo, error)
 	GetAccountInfo(accID string) (*AccountInfo, error)
+	CreateAccountFavMovie(accID, movieID string) error
+	DeleteAccountFavMovie(accID, movieID string) error
 }
 
 type AccountInfo struct {
