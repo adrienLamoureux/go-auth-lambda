@@ -18,7 +18,7 @@ type getAccountFavMovieResponse struct {
 
 func handleGetAccountFavMovies(w http.ResponseWriter, r *http.Request) {
 	// TODO: Extract the token from header
-	accID := "a"
+	accID := "42"
 	accountFavMovieInfoList, err := accountDatabase.GetAccountFavMoviesInfo(accID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -43,7 +43,7 @@ func handleGetAccountFavMovies(w http.ResponseWriter, r *http.Request) {
 
 func handleCreateAccountFavMovie(w http.ResponseWriter, r *http.Request) {
 	// TODO: Extract the token from header
-	accID := "a"
+	accID := "42"
 	params := mux.Vars(r)
 	movieID := params["movieId"]
 	if len(movieID) == 0 {
@@ -63,7 +63,7 @@ func handleCreateAccountFavMovie(w http.ResponseWriter, r *http.Request) {
 
 func handleDeleteAccountFavMovie(w http.ResponseWriter, r *http.Request) {
 	// TODO: Extract the token from header
-	accID := "a"
+	accID := "42"
 	params := mux.Vars(r)
 	movieID := params["movieId"]
 	if len(movieID) == 0 {
