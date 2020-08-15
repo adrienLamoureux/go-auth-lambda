@@ -17,8 +17,12 @@ type getAccountFavMovieResponse struct {
 }
 
 func handleGetAccountFavMovies(w http.ResponseWriter, r *http.Request) {
-	// TODO: Extract the token from header
-	accID := "42"
+	claims, err := getClaimsFromRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	accID := claims.Id
 	accountFavMovieInfoList, err := accountDatabase.GetAccountFavMoviesInfo(accID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -42,15 +46,19 @@ func handleGetAccountFavMovies(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreateAccountFavMovie(w http.ResponseWriter, r *http.Request) {
-	// TODO: Extract the token from header
-	accID := "42"
+	claims, err := getClaimsFromRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	accID := claims.Id
 	params := mux.Vars(r)
 	movieID := params["movieId"]
 	if len(movieID) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	err := accountDatabase.CreateAccountFavMovie(&databases.AccountFavMovieInfo{
+	err = accountDatabase.CreateAccountFavMovie(&databases.AccountFavMovieInfo{
 		AccID:   accID,
 		MovieID: movieID,
 	})
@@ -62,15 +70,19 @@ func handleCreateAccountFavMovie(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDeleteAccountFavMovie(w http.ResponseWriter, r *http.Request) {
-	// TODO: Extract the token from header
-	accID := "42"
+	claims, err := getClaimsFromRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	accID := claims.Id
 	params := mux.Vars(r)
 	movieID := params["movieId"]
 	if len(movieID) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	err := accountDatabase.DeleteAccountFavMovie(accID, movieID)
+	err = accountDatabase.DeleteAccountFavMovie(accID, movieID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

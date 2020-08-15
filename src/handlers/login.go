@@ -15,11 +15,6 @@ type loginRequestBody struct {
 	Email    string `json:"email"`
 }
 
-type claims struct {
-	Email string `json:"email"`
-	jwt.StandardClaims
-}
-
 type loginResponse struct {
 	Token      string `json:"token"`
 	ExpireTime int64  `json:"expireTm"`
@@ -50,14 +45,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	expirationTime := time.Now().Add(30 * time.Minute)
-	claim := &claims{
-		Email: creds.Email,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Id:        accInfo.AccID,
+		ExpiresAt: expirationTime.Unix(),
+	})
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

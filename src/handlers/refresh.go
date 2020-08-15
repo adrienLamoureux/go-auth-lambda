@@ -14,28 +14,15 @@ type refreshResponse struct {
 }
 
 func refresh(w http.ResponseWriter, r *http.Request) {
-	// TODO: Extract the token from header
-	tknStr := ""
-	claim := &claims{}
-	tkn, err := jwt.ParseWithClaims(tknStr, claim, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
+	claims, err := getClaimsFromRequest(r)
 	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	if !tkn.Valid {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	expirationTime := time.Now().Add(30 * time.Minute)
-	claim.ExpiresAt = expirationTime.Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	claims.ExpiresAt = expirationTime.Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
