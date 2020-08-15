@@ -33,7 +33,7 @@ func (accountDynamoDB *AccountDynamoDB) CreateAccountEmail(accEmailInfo *databas
 	}, accountTableDefaultName)
 }
 
-func (accountDynamoDB *AccountDynamoDB) GetAccountEmailByEmail(email string) (*databases.AccountEmailInfo, error) {
+func (accountDynamoDB *AccountDynamoDB) GetAccountEmailInfo(email string) (*databases.AccountEmailInfo, error) {
 	result, err := getItem(&keyItemInfo{
 		HashKeyName:  "email",
 		HashKeyValue: email,
@@ -41,7 +41,7 @@ func (accountDynamoDB *AccountDynamoDB) GetAccountEmailByEmail(email string) (*d
 	if err != nil {
 		return nil, err
 	}
-	if result.Item == nil {
+	if result == nil {
 		return nil, nil
 	}
 
@@ -62,7 +62,7 @@ func (accountDynamoDB *AccountDynamoDB) GetAccountInfo(accID string) (*databases
 	if err != nil {
 		return nil, err
 	}
-	if result.Item == nil {
+	if result == nil {
 		return nil, nil
 	}
 
@@ -75,11 +75,35 @@ func (accountDynamoDB *AccountDynamoDB) GetAccountInfo(accID string) (*databases
 	return item.toAbstract(), nil
 }
 
-func (accountDynamoDB *AccountDynamoDB) CreateAccountFavMovie(accID, movieID string) error {
+func (accountDynamoDB *AccountDynamoDB) GetAccountFavMoviesInfo(accID string) ([]*databases.AccountFavMovieInfo, error) {
+	result, err := getItems(&keyItemInfo{
+		HashKeyName:  "accId",
+		HashKeyValue: accID,
+	}, accountFavMovieTableDefaultName)
+	if err != nil {
+		return []*databases.AccountFavMovieInfo{}, err
+	}
+	if result == nil {
+		return []*databases.AccountFavMovieInfo{}, nil
+	}
+
+	accountFavMovieInfoList := make([]*databases.AccountFavMovieInfo, len(result.Items))
+	for i, item := range result.Items {
+		accountFavMovieData := accountFavMovieTableData{}
+		err = dynamodbattribute.UnmarshalMap(item, &accountFavMovieData)
+		if err != nil {
+			return []*databases.AccountFavMovieInfo{}, err
+		}
+		accountFavMovieInfoList[i] = accountFavMovieData.toAbstract()
+	}
+	return accountFavMovieInfoList, nil
+}
+
+func (accountDynamoDB *AccountDynamoDB) CreateAccountFavMovie(accountFavMovieInfo *databases.AccountFavMovieInfo) error {
 	timeNow := time.Now().Unix()
 	return putItem(&accountFavMovieTableData{
-		AccID:    accID,
-		MovieID:  movieID,
+		AccID:    accountFavMovieInfo.AccID,
+		MovieID:  accountFavMovieInfo.MovieID,
 		CreateTm: timeNow,
 		UpdateTm: timeNow,
 	}, accountFavMovieTableDefaultName)
@@ -134,4 +158,11 @@ type accountFavMovieTableData struct {
 	MovieID  string `json:"movieId"`
 	CreateTm int64  `json:"createTm"`
 	UpdateTm int64  `json:"updateTm"`
+}
+
+func (accountFavMovieData *accountFavMovieTableData) toAbstract() *databases.AccountFavMovieInfo {
+	return &databases.AccountFavMovieInfo{
+		AccID:   accountFavMovieData.AccID,
+		MovieID: accountFavMovieData.MovieID,
+	}
 }

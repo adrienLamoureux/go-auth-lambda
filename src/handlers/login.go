@@ -33,7 +33,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accEmailInfo, err := accountDatabase.GetAccountEmailByEmail(creds.Email)
+	accEmailInfo, err := accountDatabase.GetAccountEmailInfo(creds.Email)
 	if err != nil || accEmailInfo == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return

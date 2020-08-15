@@ -3,10 +3,16 @@ package databases
 type IAccountDatabase interface {
 	CreateAccount(accInfo *AccountInfo) error
 	CreateAccountEmail(accEmailInfo *AccountEmailInfo) error
-	GetAccountEmailByEmail(email string) (*AccountEmailInfo, error)
+	GetAccountEmailInfo(email string) (*AccountEmailInfo, error)
 	GetAccountInfo(accID string) (*AccountInfo, error)
-	CreateAccountFavMovie(accID, movieID string) error
+	GetAccountFavMoviesInfo(accID string) ([]*AccountFavMovieInfo, error)
+	CreateAccountFavMovie(accountFavMovieInfo *AccountFavMovieInfo) error
 	DeleteAccountFavMovie(accID, movieID string) error
+}
+
+type AccountFavMovieInfo struct {
+	AccID   string
+	MovieID string
 }
 
 type AccountInfo struct {
