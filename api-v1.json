@@ -1,0 +1,161 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "Auth API",
+        "version": "1.0",
+        "description": "The RESTful authentication service."
+    },
+    "paths": {
+        "/login": {
+            "post": {
+                "operationId": "login",
+                "summary": "Login",
+                "description": "Login into an account using the password.",
+                "tags": ["auth"],
+                "requestBody": {
+                    "description": "The login request information.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email","password"],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "description": "The email address."
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "description": "The password."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully signed in.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "The JWT token."
+                                        },
+                                        "expireTm": {
+                                            "type": "integer",
+                                            "description": "The token expiration time."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh": {
+            "get": {
+                "operationId": "refresh",
+                "summary": "Refresh the token",
+                "description": "Refresh the authentication session based on the token.",
+                "tags": ["auth"],
+                "responses": {
+                    "200": {
+                        "description": "Successfully refreshed the token.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "The JWT token."
+                                        },
+                                        "expireTm": {
+                                            "type": "integer",
+                                            "description": "The token expiration time."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movies": {
+            "get": {
+                "operationId": "GetFavMovieList",
+                "summary": "Get fav movie list",
+                "description": "Get the favorite movie list.",
+                "tags": ["movies"],
+                "responses": {
+                    "200": {
+                        "description": "Successfully got the favorite movie list.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "accountFavMovies": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "movieId": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movies/{movieId}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "movieId",
+                    "description": "The movie ID.",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "post": {
+                "operationId": "PostFavMovieId",
+                "summary": "Add fav movie",
+                "description": "Add a movie as a favorite.",
+                "tags": ["movies"],
+                "responses": {
+                    "200": {
+                        "description": "Successfully added the movie as a favorite."
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "DeleteFavMovieId",
+                "summary": "Remove fav movie",
+                "description": "Remove a movie as a favorite.",
+                "tags": ["movies"],
+                "responses": {
+                    "200": {
+                        "description": "Successfully removed the movie as a favorite."
+                    }
+                }
+            }
+        }
+    }
+}

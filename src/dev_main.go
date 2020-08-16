@@ -3,7 +3,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/adrienLamoureux/go-auth-lambda/src/databases/dynamodb"
@@ -20,7 +20,13 @@ func createDevRouter() *mux.Router {
 }
 
 func main() {
-	log.Fatal(http.ListenAndServe(":7200", createDevRouter()))
+	port := "7200"
+	fmt.Printf("Starting server at %s\n", port)
+	err := http.ListenAndServe(":"+port, createDevRouter())
+	if err != nil {
+		fmt.Printf("Failed to start server at port %s\nError: %s", port, err.Error())
+		panic(err)
+	}
 }
 
 func createDynamoTables(w http.ResponseWriter, r *http.Request) {
