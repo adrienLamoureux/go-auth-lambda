@@ -1,6 +1,8 @@
 package dynamodb
 
 import (
+	"os"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -8,12 +10,9 @@ import (
 
 var svc *dynamodb.DynamoDB
 
-var (
-	region   = "eu-central-1"
-	endpoint = "http://localhost:8000"
-)
-
 func init() {
+	region := os.Getenv("DYNAMO_REGION")
+	endpoint := os.Getenv("DYNAMO_ENDPOINT")
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
 			Region:   &region,
