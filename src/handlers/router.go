@@ -5,6 +5,8 @@ import (
 )
 
 func CreateRouter(router *mux.Router) {
+	router.HandleFunc("/ping", ping).Methods("GET")
+
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	apiRouter.HandleFunc("/login", login).Methods("POST")
 	apiRouter.HandleFunc("/refresh", refresh).Methods("GET")
