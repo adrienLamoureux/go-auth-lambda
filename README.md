@@ -30,8 +30,28 @@ TODO
 
 ## Run Local Server
 
+### Without docker
+
+```
+export DYNAMO_REGION=my_region
+```
+
+```
+export DYNAMO_ENDPOINT=my_endpoint
+```
+
 ```
 go run src/dev_main.go
+```
+
+### With a docker image
+
+```
+docker image build -t go-auth-lambda:X.X .
+```
+
+```
+docker container run --name go-auth-lambda -e DYNAMO_REGION=X -e DYNAMO_ENDPOINT=X -e AWS_ACCESS_KEY_ID=X -e AWS_SECRET_ACCESS_KEY=X -p X:7200 -d go-auth-lambda:X.X
 ```
 
 ## Deployment
